@@ -10,6 +10,7 @@ type actionType = {
 export const CONNECT_SUCCESSFUL = 'CONNECT_SUCCESSFUL';
 export const CONNECT_FAILED = 'CONNECT_FAILED';
 export const GET_BCI_DATA = 'GET_BCI_DATA';
+export const RESET_BCI_DATA = 'RESET_BCI_DATA';
 
 export function connectSuccess() {
   return {
@@ -30,6 +31,12 @@ export function setBciData(battery, signal, relaxation, stress) {
     signal,
     relaxation,
     stress
+  };
+}
+
+export function resetBciData() {
+  return {
+    type: RESET_BCI_DATA
   };
 }
 

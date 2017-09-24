@@ -2,7 +2,8 @@
 import {
     CONNECT_SUCCESSFUL,
     CONNECT_FAILED,
-    GET_BCI_DATA
+    GET_BCI_DATA,
+  RESET_BCI_DATA
 } from '../actions/bci';
 
 export type bciIntialStateType = {
@@ -14,7 +15,7 @@ export type bciIntialStateType = {
 };
 
 type actionType = {
-  +type: string,
+  +type: string
 };
 
 const bciInitialState = {
@@ -34,6 +35,8 @@ export default function bci(state: initialStateType = bciInitialState, action: a
     case GET_BCI_DATA:
       const { signal, battery, relaxation, stress } = action;
       return { ...state, signal, battery, relaxation, stress };
+    case RESET_BCI_DATA:
+      return { ...state, signal: 0, battery: 0, relaxation: 0, stress: 0 };
     default:
       return state;
   }
