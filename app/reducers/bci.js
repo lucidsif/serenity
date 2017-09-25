@@ -11,7 +11,7 @@ export type bciIntialStateType = {
     +signal: number,
     +battery: number,
     +relaxation: number,
-    +stress: number
+    +stress: number,
 };
 
 type actionType = {

@@ -77,7 +77,7 @@ export function readFile() {
             const userId = row[1];
             const scaledRelaxationLevel = row[13];
             const scaledStressLevel = row[5];
-            console.log('scores', scaledRelaxationLevel, scaledStressLevel);
+            console.log('time and scores', timeRunning, scaledRelaxationLevel, scaledStressLevel);
             if (scaledRelaxationLevel === 'undefined' || scaledStressLevel === 'undefined') {
               console.log('returning undefined');
               dispatch(setBciData(0.0911, 0.0911));
