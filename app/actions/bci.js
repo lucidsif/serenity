@@ -92,7 +92,6 @@ export function checkCsvFileSize() {
 export function readFile() {
   return function (dispatch) {
     const csvFile = '/Users/Sif/Downloads/community-sdk-3.5.0-WIN-MAC/build/Programs/PerformanceMetricData.csv';
-    console.log('in readfile');
     fs.readFile(csvFile, 'utf8', (err, file) => {
       if (err) {
         console.log(err);
@@ -109,11 +108,9 @@ export function readFile() {
             const scaledStressLevel = row[5];
             console.log('time and scores', timeRunning, scaledRelaxationLevel, scaledStressLevel);
             if (scaledRelaxationLevel === 'undefined' || scaledStressLevel === 'undefined') {
-              console.log('returning undefined');
               dispatch(setToWeakOrEmulated());
               dispatch(setBciData(Math.random().toFixed(2), Math.random().toFixed(2), timeRunning));
             } else {
-              console.log('not undefined');
               dispatch(unsetToWeakOrEmulated())
               dispatch(setBciData(scaledRelaxationLevel, scaledStressLevel, timeRunning));
             }

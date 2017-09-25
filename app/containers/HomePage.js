@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Home from '../components/Home';
 import { readFile, checkCsvFileSize } from '../actions/bci';
-import { playSong } from '../actions/sound';
+import { playSong, stopSong, incrementSoundPass } from '../actions/sound';
 import playSound from 'play-sound';
 
 const player = playSound({});
@@ -11,9 +11,9 @@ const player = playSound({});
 export class HomePage extends Component {
 
   constructor() {
-    super()
+    super();
 
-    this.playSound = this.playSound.bind(this)
+    this.playSound = this.playSound.bind(this);
   }
 
   componentDidMount() {
@@ -21,10 +21,15 @@ export class HomePage extends Component {
       this.props.checkConnection();
       if (this.props.bci.connected) {
         this.props.getBciData();
+        this.props.increment();
       }
     }, 1000);
-    this.playSound()
-    // if connected, get last line of csv
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.bci.stress !== nextProps.bci.stress && this.props.bci.relaxation !== nextProps.bci.relaxation) {
+      this.playSound()
+    }
   }
 
   playSound() {
@@ -32,33 +37,40 @@ export class HomePage extends Component {
     const sound = this.props.sound;
     const relaxSongPath = '/Users/Sif/Downloads/relax.wav';
     const stressSongPath = '/Users/Sif/Downloads/stress.wav';
-
-    console.log('sound:**', sound)
-    if (bci.relaxation >= bci.stress) {
+    if (bci.relaxation >= bci.stress && sound.soundType !== 'relaxation') {
       if (sound.soundObj) {
         sound.soundObj.kill();
       }
-      console.log('harmony');
       const relaxSong = player.play(relaxSongPath, (err) => {
         if (err) {
           console.log(err);
         }
       });
       this.props.play('relaxation', relaxSong);
-    } else if (bci.relaxation < !bci.stress) {
+    } else if (bci.relaxation < bci.stress && sound.soundType !== 'stress') {
       if (sound.soundObj) {
         sound.soundObj.kill();
       }
-      console.log('discord');
       const stressSong = player.play(stressSongPath, (err) => {
         if (err) {
           console.log(err);
         }
       });
       this.props.play('stress', stressSong);
-    } else {
-      console.log('nothing');
     }
+      if (sound.passes > 50) {
+        console.log('replay');
+        if (sound.soundObj) {
+          sound.soundObj.kill();
+        }
+        const currentSongPath = sound.soundType === 'relaxation' ? relaxSongPath : stressSongPath
+        const currentSong = player.play(currentSongPath, (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+        this.props.play(sound.soundType, currentSong);
+      }
   }
 
   // incrementSoundPass() {
@@ -66,7 +78,6 @@ export class HomePage extends Component {
   // }
 
   render() {
-    // this.playSound()
     return (<Home bci={this.props.bci} />
     );
   }
@@ -83,6 +94,12 @@ const mapDispatchToProps = (dispatch) => ({
   },
   play: (soundType, soundObj) => {
     dispatch(playSong(soundType, soundObj));
+  },
+  stop: () => {
+    dispatch(stopSong());
+  },
+  increment: () => {
+    dispatch(incrementSoundPass());
   }
 });
 

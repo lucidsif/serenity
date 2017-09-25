@@ -6,6 +6,7 @@ type actionType = {
 
 const soundInitialState = {
   playing: false,
+  soundType: null,
   soundObj: null,
   passes: 0
 };
@@ -14,7 +15,7 @@ const soundInitialState = {
 export default function bci(state: initialStateType = soundInitialState, action: actionType) {
   switch (action.type) {
     case PLAY_SONG:
-      return { ...state, playing: true, soundObj: action.soundObj };
+      return { ...state, playing: true, soundType: action.soundType, soundObj: action.soundObj, passes: 0 };
     case STOP_SONG:
       return { ...state, playing: false };
     case INCREMENT_SOUND_PASS:
