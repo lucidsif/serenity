@@ -33,8 +33,8 @@ export default function bci(state: initialStateType = bciInitialState, action: a
     case CONNECT_FAILED:
       return { ...state, connected: false };
     case GET_BCI_DATA:
-      const { signal, battery, relaxation, stress } = action;
-      return { ...state, signal, battery, relaxation, stress };
+      const { relaxation, stress } = action;
+      return { ...state, relaxation, stress };
     case RESET_BCI_DATA:
       return { ...state, signal: 0, battery: 0, relaxation: 0, stress: 0 };
     default:

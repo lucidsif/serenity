@@ -13,12 +13,6 @@ export default class Home extends Component {
             bci.connected ? <h3 style={{ color: 'green' }}>Connected</h3> : <h3 style={{ color: 'red' }}>Disconnected</h3>
           }
           <div>
-          Signal Strength: {bci.signal}
-          </div>
-          <div>
-          Battery Level: {bci.battery}
-          </div>
-          <div>
           Relaxation Level: {bci.relaxation}
           </div>
           <div>

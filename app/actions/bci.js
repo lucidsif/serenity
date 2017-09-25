@@ -1,10 +1,11 @@
 import fs from 'fs';
+import csv from 'csvtojson';
 
 // @flow
 import type { bciInitialStateType } from '../reducers/bci';
 
 type actionType = {
-  +type: string,
+  +type: string
 };
 
 export const CONNECT_SUCCESSFUL = 'CONNECT_SUCCESSFUL';
@@ -24,11 +25,9 @@ export function connectFail() {
   };
 }
 
-export function setBciData(battery, signal, relaxation, stress) {
+export function setBciData(relaxation, stress) {
   return {
     type: GET_BCI_DATA,
-    battery,
-    signal,
     relaxation,
     stress
   };
@@ -41,21 +40,35 @@ export function resetBciData() {
 }
 
 export function readFile() {
-  return function(dispatch) {
+  return function (dispatch) {
     // const desiredFile = `${process.cwd()}/README.md`;
-    const csvFile = '/Users/Sif/Downloads/community-sdk-3.5.0-WIN-MAC/build/Programs/emostate_logger.csv';
+    const csvFile = '/Users/Sif/Downloads/community-sdk-3.5.0-WIN-MAC/build/Programs/PerformanceMetricData.csv';
     console.log('csv file: ', csvFile);
-    fs.readFile(csvFile, 'utf8', (err, file) => {
-      if (err) {
-        dispatch(connectFail())
-        console.log('error!!!', err);
-      } else {
-        console.log('file read', file.slice(file.length - 500, file.length - 1));
-        dispatch(connectSuccess())
-        // TODO: parse values from csv here
-        dispatch(setBciData(Math.random(), Math.random(), Math.random(), Math.random()));
-      }
-    });
+    csv()
+      .fromFile(csvFile)
+      .on('json', (jsonObj) => {
+        console.log(jsonObj);
+        dispatch(setBciData(Math.random(), Math.random()));
+        // combine csv header row and csv line to a json object
+        // jsonObj.a ==> 1 or 4
+      })
+      .on('done', (error) => {
+        console.log('end');
+        if (error) {
+          dispatch(connectFail());
+        }
+      });
+    // fs.readFile(csvFile, 'utf8', (err, file) => {
+    //   if (err) {
+    //     dispatch(connectFail())
+    //     console.log('error!!!', err);
+    //   } else {
+    //     console.log('file read', file.slice(file.length - 500, file.length - 1));
+    //     dispatch(connectSuccess())
+    //     // TODO: parse values from csv here
+    //     dispatch(setBciData(Math.random(), Math.random(), Math.random(), Math.random()));
+    //   }
+    // });
   };
 }
 
