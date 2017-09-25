@@ -2,11 +2,11 @@ import fs from 'fs';
 import parse from 'csv-parse';
 
 // @flow
-import type { bciInitialStateType } from '../reducers/bci';
+// import type { bciInitialStateType } from '../reducers/bci';
 
-type actionType = {
-  +type: string
-};
+// type actionType = {
+//   +type: string
+// };
 
 export const CONNECT_SUCCESSFUL = 'CONNECT_SUCCESSFUL';
 export const CONNECT_FAILED = 'CONNECT_FAILED';
