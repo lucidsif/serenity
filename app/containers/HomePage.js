@@ -2,20 +2,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Home from '../components/Home';
-import { readFile } from '../actions/bci';
+import { readFile, checkCsvFileSize } from '../actions/bci';
 
 export class HomePage extends Component {
 
   componentDidMount() {
     setInterval(() => {
-      console.log('running');
-      this.props.changeProps();
-    }, 1000);
+      this.props.checkConnection();
+      if (this.props.bci.connected) {
+        this.props.getBciData();
+      }
+    }, 3000);
+      // if connected, get last line of csv
   }
 
 
   render() {
-    return (<Home bci={this.props.bci} changeProps={this.props.changeProps} />
+    return (<Home bci={this.props.bci} />
     );
   }
 }
@@ -23,7 +26,10 @@ export class HomePage extends Component {
 const mapStateToProps = ({ bci }) => ({ bci });
 
 const mapDispatchToProps = (dispatch) => ({
-  changeProps: () => {
+  checkConnection: () => {
+    dispatch(checkCsvFileSize());
+  },
+  getBciData: () => {
     dispatch(readFile());
   }
 });
