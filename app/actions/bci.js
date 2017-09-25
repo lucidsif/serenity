@@ -12,6 +12,8 @@ export const CONNECT_SUCCESSFUL = 'CONNECT_SUCCESSFUL';
 export const CONNECT_FAILED = 'CONNECT_FAILED';
 export const SET_BCI_DATA = 'SET_BCI_DATA';
 export const RESET_BCI_DATA = 'RESET_BCI_DATA';
+export const SET_TO_WEAK_OR_EMULATED = 'SET_TO_WEAK_OR_EMULATED'
+export const UNSET_WEAK_OR_EMULATED = 'UNSET_WEAK_OR_EMULATED'
 
 export function connectSuccess() {
   return {
@@ -25,11 +27,12 @@ export function connectFail() {
   };
 }
 
-export function setBciData(relaxation, stress) {
+export function setBciData(relaxation, stress, time) {
   return {
     type: SET_BCI_DATA,
     relaxation,
-    stress
+    stress,
+    time
   };
 }
 
@@ -39,22 +42,49 @@ export function resetBciData() {
   };
 }
 
+export function setToWeakOrEmulated() {
+  return {
+    type: SET_TO_WEAK_OR_EMULATED
+  };
+}
+
+export function unsetToWeakOrEmulated() {
+  return {
+    type: UNSET_WEAK_OR_EMULATED
+  };
+}
+
 export function checkCsvFileSize() {
   return function (dispatch) {
     const csvFile = '/Users/Sif/Downloads/community-sdk-3.5.0-WIN-MAC/build/Programs/PerformanceMetricData.csv';
-    const stats1 = fs.statSync(csvFile);
-    const firstReadBytes = stats1.size;
-    setTimeout(() => {
-      const stats2 = fs.statSync(csvFile);
-      const secondReadBytes = stats2.size;
-      console.log('time', secondReadBytes, firstReadBytes);
-      if (secondReadBytes > firstReadBytes) {
-        dispatch(connectSuccess());
-      } else {
+
+    fs.stat(csvFile, (err1, stats1) => {
+      if (err1) {
+        console.log(err);
         dispatch(connectFail());
         dispatch(resetBciData());
+      } else {
+        const firstReadBytes = stats1.size;
+        setTimeout(() => {
+          fs.stat(csvFile, (err2, stats2) => {
+            if (err2) {
+              console.log(err2);
+              dispatch(connectFail());
+              dispatch(resetBciData());
+            } else {
+              const secondReadBytes = stats2.size;
+              console.log('time', secondReadBytes, firstReadBytes);
+              if (secondReadBytes > firstReadBytes) {
+                dispatch(connectSuccess());
+              } else {
+                dispatch(connectFail());
+                dispatch(resetBciData());
+              }
+            }
+          });
+        }, 1000);
       }
-    }, 3000);
+    });
   };
 }
 
@@ -80,10 +110,12 @@ export function readFile() {
             console.log('time and scores', timeRunning, scaledRelaxationLevel, scaledStressLevel);
             if (scaledRelaxationLevel === 'undefined' || scaledStressLevel === 'undefined') {
               console.log('returning undefined');
-              dispatch(setBciData(0.0911, 0.0911));
+              dispatch(setToWeakOrEmulated());
+              dispatch(setBciData(Math.random().toFixed(2), Math.random().toFixed(2), timeRunning));
             } else {
               console.log('not undefined');
-              dispatch(setBciData(scaledRelaxationLevel, scaledStressLevel));
+              dispatch(unsetToWeakOrEmulated())
+              dispatch(setBciData(scaledRelaxationLevel, scaledStressLevel, timeRunning));
             }
           }
         });
@@ -168,22 +200,3 @@ export function readFile() {
 //   };
 // }
 
-function CSVtoArray(text) {
-  const re_valid = /^\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*(?:,\s*(?:'[^'\\]*(?:\\[\S\s][^'\\]*)*'|"[^"\\]*(?:\\[\S\s][^"\\]*)*"|[^,'"\s\\]*(?:\s+[^,'"\s\\]+)*)\s*)*$/;
-  const re_value = /(?!\s*$)\s*(?:'([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g;
-  // Return NULL if input string is not well formed CSV string.
-  if (!re_valid.test(text)) return null;
-  const a = [];                     // Initialize array to receive values.
-  text.replace(re_value, // "Walk" the string using replace with callback.
-    (m0, m1, m2, m3) => {
-      // Remove backslash from \' in single quoted values.
-      if (m1 !== undefined) a.push(m1.replace(/\\'/g, "'"));
-      // Remove backslash from \" in double quoted values.
-      else if (m2 !== undefined) a.push(m2.replace(/\\"/g, '"'));
-      else if (m3 !== undefined) a.push(m3);
-      return ''; // Return empty string.
-    });
-  // Handle special case of empty last value.
-  if (/,\s*$/.test(text)) a.push('');
-  return a;
-}

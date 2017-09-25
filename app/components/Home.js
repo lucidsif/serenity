@@ -12,8 +12,11 @@ export default class Home extends Component {
             bci.connected ? <h3 style={{ color: 'green' }}>Connected</h3> : <h3 style={{ color: 'red' }}>Disconnected</h3>
           }
           {
-            bci.relaxation === 0.0911 && (<h4 style={{ color: 'orange' }}> Weak Signal/Emulator</h4>)
+            bci.connected && bci.weakOrEmulated && (<h4 style={{ color: 'orange' }}> Weak Signal or Emulator</h4>)
           }
+          <div>
+            Time Running: {bci.time}
+          </div>
           <div>
           Relaxation Level: {bci.relaxation}
           </div>

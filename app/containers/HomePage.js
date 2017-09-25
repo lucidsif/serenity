@@ -12,7 +12,7 @@ export class HomePage extends Component {
       if (this.props.bci.connected) {
         this.props.getBciData();
       }
-    }, 3000);
+    }, 1000);
       // if connected, get last line of csv
   }
 
