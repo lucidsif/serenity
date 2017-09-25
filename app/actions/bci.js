@@ -42,15 +42,17 @@ export function resetBciData() {
 
 export function readFile() {
   return function(dispatch) {
-    const desiredFile = `${process.cwd()}/README.md`;
-    console.log('desired file: ', desiredFile);
-    fs.readFile(desiredFile, 'utf8', (err, file) => {
+    // const desiredFile = `${process.cwd()}/README.md`;
+    const csvFile = '/Users/Sif/Downloads/community-sdk-3.5.0-WIN-MAC/build/Programs/emostate_logger.csv';
+    console.log('csv file: ', csvFile);
+    fs.readFile(csvFile, 'utf8', (err, file) => {
       if (err) {
         dispatch(connectFail())
         console.log('error!!!', err);
       } else {
-        console.log('file read', file.slice(0, 100));
+        console.log('file read', file.slice(file.length - 500, file.length - 1));
         dispatch(connectSuccess())
+        // TODO: parse values from csv here
         dispatch(setBciData(Math.random(), Math.random(), Math.random(), Math.random()));
       }
     });
