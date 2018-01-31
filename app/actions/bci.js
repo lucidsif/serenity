@@ -60,7 +60,7 @@ export function checkCsvFileSize() {
 
     fs.stat(csvFile, (err1, stats1) => {
       if (err1) {
-        console.log(err);
+        console.log(err1);
         dispatch(connectFail());
         dispatch(resetBciData());
       } else {
